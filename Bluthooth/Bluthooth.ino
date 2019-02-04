@@ -1,34 +1,32 @@
-#include<IRremote.h>
-
-#define r1 5
-#define r2 6
-#define r3 7
-#define r4 8
-
-int RECV_PIN = 3;
-IRrecv irrecv(RECV_PIN);
-decode_results results;
+#include "SoftwareSerial.h"
+#define r1 6
+#define r2 7
+#define r3 8
+#define r4 9
 int relay1=LOW;
 int relay2=LOW;
 int relay3=LOW;
 int relay4=LOW;
-
-void setup()
-{
-  Serial.begin(9600);
-  irrecv.enableIRIn(); // Start the receiver
-  pinMode(r1,OUTPUT);
+int data;
+SoftwareSerial HC05(4,5);//tx ,rx
+void setup() {
+  // put your setup code here, to run once:
+Serial.begin(9600);
+HC05.begin(9600);
+pinMode(r1,OUTPUT);
   pinMode(r2,OUTPUT);
   pinMode(r3,OUTPUT);
    pinMode(r4,OUTPUT);
   
-  
 }
 
 void loop() {
-  if (irrecv.decode(&results)) {
-    Serial.println(results.value, DEC);
-    switch(results.value)
+  // put your main code here, to run repeatedly:
+if(HC05.available())
+{
+  data=HC05.read();
+  Serial.println(data);
+  switch(data)
     {
       case 2704:
        digitalWrite(r1,1);
@@ -37,27 +35,26 @@ void loop() {
         digitalWrite(r4,0);
        delay(250);
        break;
-       case 16:
+       case 49:
          relay1= ~ relay1;
         digitalWrite(r1,relay1);
         delay(250);
         break;
-       case 2064:
+       case 50:
         relay2 = ~ relay2;
         digitalWrite(r2,relay2);
         delay(250);
         break;
-        case 1040:
+        case 51:
         relay3= ~ relay3;
         digitalWrite(r3,relay3);
         delay(250);
         break;
-        case 3088:
+        case 52:
         relay4= ~relay4;
         digitalWrite(r4,relay4);
         delay(250);
 
       }
-    irrecv.resume(); // Receive the next value
   }
 }
